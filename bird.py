@@ -1,3 +1,7 @@
+from pico2d import load_image, get_canvas_width
+
+import game_framework
+
 # 새(Bird) 비행 애니메이션 - 물리 단위 상수 정의
 # boy.py 와 동일하게 "미터 -> 픽셀", "km/h -> 초당 픽셀", "초당 프레임" 순서로 환산한다.
 
@@ -39,3 +43,32 @@ FRAMES_PER_FLAP = FRAME_COUNT
 def flap_frames_per_second(speed_kmph):
     speed_mps = speed_kmph * 1000.0 / 3600.0
     return speed_mps / METERS_PER_FLAP * FRAMES_PER_FLAP
+
+
+DRAW_W = CELL_W // 2  # 화면에는 절반 크기로 그린다
+DRAW_H = CELL_H // 2
+
+
+class Bird:
+    image = None  # 10마리가 시트를 공유하도록 클래스 변수로 한 번만 로드
+
+    def __init__(self, x, y, speed_kmph):
+        if Bird.image is None:
+            Bird.image = load_image('bird_animation.png')
+        self.x, self.y = x, y
+        self.speed_kmph = speed_kmph
+        self.frame = 0.0  # 실수 프레임: 그릴 때만 int() 로 내림
+        self.dir = 1  # 1: 오른쪽, -1: 왼쪽
+
+    def update(self):
+        pass
+
+    def draw(self):
+        index = int(self.frame) % FRAME_COUNT
+        col = index % SHEET_COLUMNS
+        row = index // SHEET_COLUMNS
+        left = col * CELL_W
+        bottom = max(0, SHEET_HEIGHT - (row + 1) * CELL_H)  # pico2d 는 y 가 아래부터
+        flip = '' if self.dir == 1 else 'h'
+        self.image.clip_composite_draw(left, bottom, CELL_W, CELL_H,
+                                       0, flip, self.x, self.y, DRAW_W, DRAW_H)
