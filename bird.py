@@ -61,7 +61,20 @@ class Bird:
         self.dir = 1  # 1: 오른쪽, -1: 왼쪽
 
     def update(self):
-        pass
+        dt = game_framework.frame_time  # 직전 프레임에 걸린 실제 시간(초)
+        # 날갯짓: 초당 프레임 * dt 만큼만 누적 -> 컴퓨터 성능과 무관한 일정한 날갯짓
+        self.frame = (self.frame + flap_frames_per_second(self.speed_kmph) * dt) % FRAME_COUNT
+        # 이동: 초당 픽셀 * dt
+        self.x += self.dir * kmph_to_pps(self.speed_kmph) * dt
+
+        # 화면 좌우 끝에서 방향 반전 (왕복 비행)
+        half = DRAW_W / 2
+        if self.x > get_canvas_width() - half:
+            self.x = get_canvas_width() - half
+            self.dir = -1
+        elif self.x < half:
+            self.x = half
+            self.dir = 1
 
     def draw(self):
         index = int(self.frame) % FRAME_COUNT
