@@ -1,3 +1,5 @@
+import random
+
 from pico2d import load_image, get_canvas_width
 
 import game_framework
@@ -57,7 +59,7 @@ class Bird:
             Bird.image = load_image('bird_animation.png')
         self.x, self.y = x, y
         self.speed_kmph = speed_kmph
-        self.frame = 0.0  # 실수 프레임: 그릴 때만 int() 로 내림
+        self.frame = random.uniform(0, FRAME_COUNT)  # 마리마다 날갯짓 시작 위상이 다르게. 실수 프레임: 그릴 때만 int() 로 내림
         self.dir = 1  # 1: 오른쪽, -1: 왼쪽
 
     def update(self):
